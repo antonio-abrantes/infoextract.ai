@@ -318,6 +318,7 @@ export default function Home() {
                 <SaveIcon className="w-4 h-4" />
                 Process Data
               </Button>
+              <span className="text-muted-foreground mt-2 ml-2">Generate csv file</span>
             </div>
           </div>
           <div className="mt-10">
