@@ -11,7 +11,7 @@ import { MenuTable } from "@/components/menu-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { SaveIcon } from "lucide-react";
-import { Toaster, toast } from 'sonner';
+import { Toaster, toast } from "sonner";
 import { useAIProvider } from "@/contexts/ai-provider-context";
 import { convertToCSV, downloadCSV } from "@/lib/utils";
 import { ApiKeyWarningModal } from "@/components/api-key-warning-modal";
@@ -36,7 +36,8 @@ export default function Home() {
   >("initial");
   const [parsedMenu, setParsedMenu] = useState<MenuItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const { provider, analysisType, storageProvider, globalApiKey } = useAIProvider();
+  const { provider, analysisType, storageProvider, globalApiKey } =
+    useAIProvider();
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [lastRequestItems, setLastRequestItems] = useState<number>(0);
   const [isApiKeyWarningOpen, setIsApiKeyWarningOpen] = useState(false);
@@ -62,12 +63,13 @@ export default function Home() {
       formData.append("file", file);
       formData.append("apiKey", globalApiKey);
 
-      const uploadEndpoint = storageProvider === 'minio'
-        ? '/api/s3-upload-minio'
-        : '/api/s3-upload-aws';
+      const uploadEndpoint =
+        storageProvider === "minio"
+          ? "/api/s3-upload-minio"
+          : "/api/s3-upload-aws";
 
-      let storageUrl = '';
-      if (storageProvider === 'minio') {
+      let storageUrl = "";
+      if (storageProvider === "minio") {
         const uploadResponse = await fetch(uploadEndpoint, {
           method: "POST",
           body: formData,
@@ -93,7 +95,8 @@ export default function Home() {
         storageUrl = url;
       }
 
-      const endpoint = provider === 'groq' ? '/api/groq-parse' : '/api/openai-parse';
+      const endpoint =
+        provider === "groq" ? "/api/groq-parse" : "/api/openai-parse";
       const parseResponse = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -102,7 +105,7 @@ export default function Home() {
         body: JSON.stringify({
           imageUrl: storageUrl,
           analysisType,
-          apiKey: globalApiKey
+          apiKey: globalApiKey,
         }),
       });
 
@@ -115,27 +118,28 @@ export default function Home() {
 
       try {
         const menuItems = JSON.parse(parseData.choices[0].message.content);
-        const menuItemsWithImage = menuItems.map((item: Omit<MenuItem, 'id'>) => ({
-          id: crypto.randomUUID(),
-          ...item,
-          menuImage: {
-            b64_json: "/images/placeholder.jpg",
-          },
-        }));
+        const menuItemsWithImage = menuItems.map(
+          (item: Omit<MenuItem, "id">) => ({
+            id: crypto.randomUUID(),
+            ...item,
+            menuImage: {
+              b64_json: "/images/placeholder.jpg",
+            },
+          })
+        );
         setLastRequestItems(menuItems.length);
-        setParsedMenu(prevItems => [...prevItems, ...menuItemsWithImage]);
-        toast.success('Menu processed successfully!');
+        setParsedMenu((prevItems) => [...prevItems, ...menuItemsWithImage]);
+        toast.success("Menu processed successfully!");
         setStatus("created");
       } catch (e) {
         console.error("Error processing items:", e);
-        toast.error('Error processing items. Please try again.');
+        toast.error("Error processing items. Please try again.");
         setStatus("error");
       }
-
     } catch (error: unknown) {
       const err = error as Error;
       console.error("Detailed error:", err);
-      toast.error(`Error: ${err.message || 'Unknown error'}`);
+      toast.error(`Error: ${err.message || "Unknown error"}`);
       setStatus("error");
     } finally {
       if (objectUrl) {
@@ -166,32 +170,34 @@ export default function Home() {
       const dataToSend = {
         totalItems: parsedMenu.length,
         lastModified: new Date().toISOString(),
-        items: parsedMenu.map(item => ({
+        items: parsedMenu.map((item) => ({
           name: item.name,
           price: item.price,
           description: item.description,
           codigo: item.codigo,
           category: item.category,
-        }))
+        })),
       };
 
       console.log("Data that would be sent:", dataToSend);
 
       // Gera e faz download do CSV
       const csv = convertToCSV(dataToSend.items);
-      const filename = `menu_items_${new Date().toISOString().split('T')[0]}.csv`;
+      const filename = `menu_items_${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
       downloadCSV(csv, filename);
 
-      toast.success('Data processed and CSV generated successfully!');
+      toast.success("Data processed and CSV generated successfully!");
     } catch (error) {
-      toast.error('Error processing data');
-      console.error('Error processing data:', error);
+      toast.error("Error processing data");
+      console.error("Error processing data:", error);
     }
   };
 
   const handleDeleteItem = (id: string) => {
-    setParsedMenu(prevItems => prevItems.filter(item => item.id !== id));
-    toast.success('Item successfully deleted!');
+    setParsedMenu((prevItems) => prevItems.filter((item) => item.id !== id));
+    toast.success("Item successfully deleted!");
   };
 
   return (
@@ -210,7 +216,8 @@ export default function Home() {
       </div>
       <div className="max-w-6xl text-center mx-auto">
         <p className="mb-8 text-lg text-muted-foreground text-balance">
-          Take a picture of a menu or item and extract detailed data to streamline your cataloging process.
+          Take a picture of a menu or item and extract detailed data to
+          streamline your cataloging process.
         </p>
       </div>
 
@@ -226,8 +233,9 @@ export default function Home() {
             >
               {({ getRootProps, getInputProps, isDragAccept }) => (
                 <div
-                  className={`mt-2 flex aspect-video cursor-pointer items-center justify-center rounded-lg border-2 border-dashed bg-background ${isDragAccept ? "border-primary" : "border-border"
-                    }`}
+                  className={`mt-2 flex aspect-video cursor-pointer items-center justify-center rounded-lg border-2 border-dashed bg-background ${
+                    isDragAccept ? "border-primary" : "border-border"
+                  }`}
                   {...getRootProps()}
                 >
                   <input {...getInputProps()} />
@@ -279,12 +287,21 @@ export default function Home() {
                 <Button
                   onClick={resetUpload}
                   variant="outline"
-                  style={{ width: '150px' }}
+                  style={{ width: "150px" }}
                 >
                   Process new image
                 </Button>
               </div>
             )}
+          </div>
+        )}
+
+        {status === "uploading" && (
+          <div className="mt-10 flex flex-col items-center">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-500" />
+              <p className="text-lg text-gray-600">Image processing...</p>
+            </div>
           </div>
         )}
 
@@ -310,7 +327,6 @@ export default function Home() {
                 </div>
               </div>
             )}
-
           </div>
         )}
       </div>
@@ -322,7 +338,7 @@ export default function Home() {
                 <Button
                   onClick={resetUpload}
                   variant="outline"
-                  style={{ width: '150px' }}
+                  style={{ width: "150px" }}
                 >
                   New Image
                 </Button>
@@ -330,12 +346,14 @@ export default function Home() {
               <Button
                 onClick={handleProcessData}
                 className="flex items-center gap-2"
-                style={{ width: '150px' }}
+                style={{ width: "150px" }}
               >
                 <SaveIcon className="w-4 h-4" />
                 Process Data
               </Button>
-              <span className="text-muted-foreground mt-2 ml-2">Generate csv file</span>
+              <span className="text-muted-foreground mt-2 ml-2">
+                Generate csv file
+              </span>
             </div>
           </div>
           <div className="mt-10">
@@ -344,7 +362,9 @@ export default function Home() {
                 <h2 className="text-4xl font-bold flex items-center gap-3">
                   <span>{lastRequestItems} items detected</span>
                   <span className="text-muted-foreground text-xl">•</span>
-                  <span className="text-muted-foreground text-xl">{parsedMenu.length} total items</span>
+                  <span className="text-muted-foreground text-xl">
+                    {parsedMenu.length} total items
+                  </span>
                 </h2>
                 {status === "created" && (
                   <p className="text-sm text-gray-500 mt-1">
@@ -376,7 +396,10 @@ export default function Home() {
                 <TabsTrigger value="table">Table</TabsTrigger>
               </TabsList>
               <TabsContent value="grid">
-                <MenuGrid items={filteredMenu} onDeleteItem={handleDeleteItem} />
+                <MenuGrid
+                  items={filteredMenu}
+                  onDeleteItem={handleDeleteItem}
+                />
               </TabsContent>
               <TabsContent value="table">
                 <MenuTable
