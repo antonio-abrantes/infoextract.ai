@@ -14,6 +14,7 @@ import { SaveIcon } from "lucide-react";
 import { Toaster, toast } from 'sonner';
 import { useAIProvider } from "@/contexts/ai-provider-context";
 import { convertToCSV, downloadCSV } from "@/lib/utils";
+import { ApiKeyWarningModal } from "@/components/api-key-warning-modal";
 
 export interface MenuItem {
   id: string;
@@ -38,6 +39,7 @@ export default function Home() {
   const { provider, analysisType, storageProvider, globalApiKey } = useAIProvider();
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [lastRequestItems, setLastRequestItems] = useState<number>(0);
+  const [isApiKeyWarningOpen, setIsApiKeyWarningOpen] = useState(false);
 
   const resetUpload = () => {
     setMenuUrl(undefined);
@@ -45,6 +47,11 @@ export default function Home() {
   };
 
   const handleFileChange = async (file: File) => {
+    if (!globalApiKey) {
+      setIsApiKeyWarningOpen(true);
+      return;
+    }
+
     setCurrentFile(file);
     const objectUrl = URL.createObjectURL(file);
     setMenuUrl(objectUrl);
@@ -150,6 +157,11 @@ export default function Home() {
   };
 
   const handleProcessData = () => {
+    if (!globalApiKey) {
+      setIsApiKeyWarningOpen(true);
+      return;
+    }
+
     try {
       const dataToSend = {
         totalItems: parsedMenu.length,
@@ -185,6 +197,11 @@ export default function Home() {
   return (
     <div className="container text-center px-4 py-8 bg-background text-foreground max-w-5xl mx-auto">
       <Toaster position="top-right" richColors />
+
+      <ApiKeyWarningModal
+        isOpen={isApiKeyWarningOpen}
+        onClose={() => setIsApiKeyWarningOpen(false)}
+      />
 
       <div className="max-w-4xl text-center mx-auto sm:mt-4 mt-2">
         <h1 className="mb-6 text-balance text-6xl font-bold text-foreground">
