@@ -18,8 +18,9 @@
 
 1. Clone the repo: `git clone https://github.com/antonio-abrantes/infoextract.ai`
 2. Create a `.env` file and add your GROQ and OpenAI API key's: `GROQ_API_KEY=` and `OPENAI_API_KEY=`
-3. Create an S3 bucket (AWS or MinIO) and add the credentials to your `.env` file. Follow [this guide](https://next-s3-upload.codingvalue.com/setup) to set them up. All required values are in the `.env.example` file.
-4. Run `npm install` and `npm run dev` to install dependencies and run locally.
+3. Still in the `.env`, You need to set your GLOBAL API key: `GLOBAL_API_KEY=`. You can create one on sites like [API key generator](https://generate-random.org/api-key-generator)
+4. Create an S3 bucket (AWS or MinIO) and add the credentials to your `.env` file. Follow [this guide](https://next-s3-upload.codingvalue.com/setup) to set them up. All required values are in the `.env.example` file.
+5. Run `npm install` and `npm run dev` to install dependencies and run locally.
 
 ## Example images for testing
 
